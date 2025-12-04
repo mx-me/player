@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "src/index.tsx",
-  "module": "src/index.tsx",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
   "scripts": {
-    "dev": "bun --hot src/index.tsx",
-    "build": "bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
-    "start": "NODE_ENV=production bun src/index.tsx"
+    "dev": "bun --hot src/index.ts",
+    "build": "bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'"
   },
   "dependencies": {
     "react": "^19.2.1",

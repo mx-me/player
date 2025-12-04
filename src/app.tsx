@@ -1,20 +1,13 @@
-import {
-  createContext,
-  Ref,
-  RefObject,
-  useContext,
-  useEffect,
-  useRef,
-} from 'react'
+import { createContext, RefObject, useEffect, useRef } from 'react'
 import { Tracklist } from './components/tracklist'
 import './index.css'
 
 interface AppContext {
-  currentTrack: string
-  audio: RefObject<AudioContext | null>
+  currentTrack?: string
+  audio?: RefObject<AudioContext | null>
 }
 
-export const AppContext = createContext<AppContext | null>(null)
+export const AppContext = createContext<AppContext>({})
 
 export function App() {
   const audioRef = useRef<AudioContext>(null)

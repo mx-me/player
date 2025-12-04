@@ -21,5 +21,6 @@ nix develop -c bun dev
 ## Building
 
 ```bash
+bun install --frozen-lockfile
 bun run build
 ```

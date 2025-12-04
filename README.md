@@ -1,21 +1,25 @@
-# bun-react-template
+# player
 
-To install dependencies:
+Minimal React local music player made using Bun
+
+## Getting started
+
+Requires Bun >1.2.12
 
 ```bash
 bun install
-```
-
-To start a development server:
-
-```bash
 bun dev
 ```
 
-To run for production:
+Or with nix:
 
 ```bash
-bun start
+nix develop -c bun install
+nix develop -c bun dev
 ```
 
-This project was created using `bun init` in bun v1.2.12. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Building
+
+```bash
+bun run build
+```

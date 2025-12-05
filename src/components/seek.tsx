@@ -32,5 +32,11 @@ export const Seek = () => {
     }
   }, [audioManager])
 
+  return (
+    <div className='progress-container'>
+      <div className='seek'></div>
+      <div className='buffered'></div>
+    </div>
+  )
   return <progress value={0} max={1} ref={progressRef} />
 }

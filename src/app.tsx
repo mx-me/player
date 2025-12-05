@@ -42,8 +42,12 @@ export function App() {
       <audio ref={elementRef} crossOrigin='anonymous'></audio>
       <main>
         <Tracklist />
-        {/* <button onClick={() => audioManager?.play()}>Play</button> 
-        <button onClick={() => audioManager?.pause()}>Pause</button> */}
+        <button key={'play'} onClick={() => audioManager?.play()}>
+          Play
+        </button>
+        <button key={'pause'} onClick={() => audioManager?.pause()}>
+          Pause
+        </button>
       </main>
     </AppContext.Provider>
   )

@@ -24,6 +24,7 @@ ul {
   gap: 5px;
   background-color: #000;
   width: 100vw;
+  height: 300px;
   max-height: 300px;
   overflow: scroll;
 }

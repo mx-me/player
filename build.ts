@@ -8,7 +8,7 @@ await build({
   entrypoints: ['./src/index.html'],
   outdir: outDir,
   minify: true,
-  define: { 'process.env.NODE_ENV': 'production' },
+  define: { 'NODE_ENV': 'production' },
   env: 'BUN_PUBLIC_*',
   target: 'browser'
 })

@@ -2,6 +2,7 @@ import { createContext, RefObject, useEffect, useRef, useState } from 'react'
 import { Tracklist } from './components/tracklist'
 import './index.css'
 import { Audio } from './audio'
+import { Seek } from './components/seek'
 
 interface AppContext {
   audioManager?: Audio
@@ -42,6 +43,7 @@ export function App() {
       <audio ref={elementRef} crossOrigin='anonymous'></audio>
       <main>
         <Tracklist />
+        <Seek />
         <button key={'play'} onClick={() => audioManager?.play()}>
           Play
         </button>

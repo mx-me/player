@@ -56,8 +56,8 @@ export function App() {
       <audio ref={elementRef} crossOrigin='anonymous'></audio>
       <main>
         <Art />
-        <Tracklist />
         <Seek />
+        <Tracklist />
         <button key={'play'} onClick={() => audioManager?.play()}>
           Play
         </button>

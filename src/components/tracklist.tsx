@@ -1,7 +1,7 @@
 import { AppContext } from '@/app'
 import { useContext, useEffect, useState } from 'react'
 
-interface Track {
+export interface Track {
   id: number
   title: string
   location: string
@@ -30,18 +30,16 @@ export const Tracklist = () => {
   }, [audioManager])
 
   if (!tracks) {
-    return <section>loading tracks...</section>
+    return <ul></ul>
   }
 
   return (
-    <section>
-      <ul>
-        {tracks.map(({ blurhash, cover, id, location, title }) => (
-          <li key={id} onClick={() => audioManager?.changeTrack(location)}>
-            {title}
-          </li>
-        ))}
-      </ul>
-    </section>
+    <ul>
+      {tracks.map((track) => (
+        <li key={track.id} onClick={() => audioManager?.changeTrack(track)}>
+          {track.title}
+        </li>
+      ))}
+    </ul>
   )
 }

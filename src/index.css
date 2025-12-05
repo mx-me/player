@@ -39,6 +39,7 @@ ul {
   max-height: 300px;
   overflow: scroll;
   border-radius: 5px;
+  user-select: none;
 }
 
 li {
@@ -94,6 +95,7 @@ li:hover {
 }
 
 .art img {
+  user-select: none;
   display: block;
   width: 100%;
   height: 100% !important;

@@ -10,7 +10,7 @@ export interface Track {
 }
 
 export const Tracklist = () => {
-  const { audioManager } = useContext(AppContext)
+  const { audioManager, setTrack } = useContext(AppContext)
   const [tracks, setTracks] = useState<Track[]>()
 
   useEffect(() => {
@@ -36,7 +36,13 @@ export const Tracklist = () => {
   return (
     <ul>
       {tracks.map((track) => (
-        <li key={track.id} onClick={() => audioManager?.changeTrack(track)}>
+        <li
+          key={track.id}
+          onClick={() => {
+            if (setTrack) setTrack(track)
+            audioManager?.changeTrack(track)
+          }}
+        >
           {track.title}
         </li>
       ))}

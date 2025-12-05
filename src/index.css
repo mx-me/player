@@ -3,7 +3,7 @@
   line-height: 1.5;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #000000;
 }
 
 body {
@@ -18,6 +18,13 @@ body {
 main {
   width: 100vw;
   max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  padding: 30px 10px;
+  box-sizing: border-box;
 }
 
 ul {
@@ -27,11 +34,11 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  background-color: #000;
   width: 100%;
   height: 300px;
   max-height: 300px;
   overflow: scroll;
+  border-radius: 5px;
 }
 
 li {
@@ -78,4 +85,12 @@ li:hover {
 .progress-container .buffered {
   width: 20%;
   background-color: rgb(255, 255, 255, 0.15);
+}
+
+img {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: auto !important;
+  border-radius: 5px;
 }

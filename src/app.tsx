@@ -58,12 +58,6 @@ export function App() {
         <Art />
         <Seek />
         <Tracklist />
-        <button key={'play'} onClick={() => audioManager?.play()}>
-          Play
-        </button>
-        <button key={'pause'} onClick={() => audioManager?.pause()}>
-          Pause
-        </button>
       </main>
     </AppContext.Provider>
   )

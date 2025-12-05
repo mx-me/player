@@ -7,8 +7,6 @@ export class Audio {
 
   public element
 
-  public track?: Track
-
   constructor(mediaElement: HTMLAudioElement) {
     this.context = new AudioContext()
     this.element = mediaElement
@@ -38,17 +36,15 @@ export class Audio {
     this.context.suspend()
   }
 
-  public changeTrack(track: Track) {
+  public changeTrack({ location, cover, title }: Track) {
     this.pause()
-    this.element.src = track.location
+    this.element.src = location
     this.play()
-
-    this.track = track
 
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
-        artwork: [{ src: track.cover }],
-        title: track.title
+        artwork: [{ src: cover }],
+        title
       })
     }
   }

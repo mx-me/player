@@ -1,8 +1,11 @@
+import { Track } from './components/tracklist'
+
 export class Audio {
   private context
-  private element
   private sourceNode
   private gainNode
+
+  public element
 
   constructor(mediaElement: HTMLAudioElement) {
     this.context = new AudioContext()
@@ -33,10 +36,17 @@ export class Audio {
     this.context.suspend()
   }
 
-  public changeTrack(url: string) {
+  public changeTrack({ cover, location, title }: Track) {
     this.pause()
-    this.element.src = url
+    this.element.src = location
     this.play()
+
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        artwork: [{ src: cover }],
+        title
+      })
+    }
   }
 
   public destroy() {

@@ -62,7 +62,7 @@ li:hover {
 
 .progress-container .seek,
 .buffered {
-  width: 0;
+  width: 0%;
   height: 5px;
   position: absolute;
   transform: translateY(0px);
@@ -77,20 +77,24 @@ li:hover {
 }
 
 .progress-container .seek {
-  width: 5%;
   background-color: #fff;
   z-index: 1;
 }
 
 .progress-container .buffered {
-  width: 20%;
   background-color: rgb(255, 255, 255, 0.15);
 }
 
-img {
-  display: block;
+.art {
   width: 100%;
   max-width: 300px;
-  height: auto !important;
+  aspect-ratio: 1;
   border-radius: 5px;
+  overflow: hidden;
+}
+
+.art img {
+  display: block;
+  width: 100%;
+  height: 100% !important;
 }

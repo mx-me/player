@@ -44,11 +44,7 @@ export const Seek = () => {
       if (seekPercent < 0) seekPercent = 0
       if (seekPercent > 1) seekPercent = 1
 
-      if (seeking) {
-        seekRef.current.style.width = `${seekPercent * 100}%`
-      } else {
-        audioManager.element.currentTime = seekPercent * duration
-      }
+      audioManager.element.currentTime = seekPercent * duration
     }
 
     progressRef.current?.addEventListener(

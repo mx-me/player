@@ -1,16 +1,27 @@
-import { createContext, RefObject, useEffect, useRef, useState } from 'react'
-import { Tracklist } from './components/tracklist'
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+import { Track, Tracklist } from './components/tracklist'
 import './index.css'
 import { Audio } from './audio'
 import { Seek } from './components/seek'
+import { Art } from './components/art'
 
 interface AppContext {
+  track?: Track
+  setTrack?: Dispatch<SetStateAction<Track | undefined>>
   audioManager?: Audio
 }
 
 export const AppContext = createContext<AppContext>({})
 
 export function App() {
+  const [track, setTrack] = useState<Track | undefined>(undefined)
   const [audioManager, setAudioManager] = useState<Audio | undefined>(undefined)
   const elementRef = useRef<HTMLAudioElement>(null)
   const [isReady, setIsReady] = useState(false)
@@ -38,10 +49,13 @@ export function App() {
     <AppContext.Provider
       value={{
         audioManager,
+        setTrack,
+        track,
       }}
     >
       <audio ref={elementRef} crossOrigin='anonymous'></audio>
       <main>
+        <Art />
         <Tracklist />
         <Seek />
         <button key={'play'} onClick={() => audioManager?.play()}>

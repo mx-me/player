@@ -20,7 +20,6 @@ export const Tracklist = () => {
 
     fetch('/tracks.json', { signal }).then((req) =>
       req.json().then((tracks) => {
-        console.log(tracks)
         setTracks(tracks)
       }),
     )
@@ -30,17 +29,17 @@ export const Tracklist = () => {
     }
   }, [audioManager])
 
-  if (!tracks || !audioManager) {
+  if (!tracks) {
     return <section>loading tracks...</section>
   }
-
-  const changeTrack = (id: string) => {}
 
   return (
     <section>
       <ul>
         {tracks.map(({ blurhash, cover, id, location, title }) => (
-          <li key={id}>{title}</li>
+          <li key={id} onClick={() => audioManager?.changeTrack(location)}>
+            {title}
+          </li>
         ))}
       </ul>
     </section>

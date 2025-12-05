@@ -1,38 +1,51 @@
-import { createContext, RefObject, useEffect, useRef } from 'react'
+import { createContext, RefObject, useEffect, useRef, useState } from 'react'
 import { Tracklist } from './components/tracklist'
 import './index.css'
+import { Audio } from './audio'
 
 interface AppContext {
-  currentTrack?: string
-  audio?: RefObject<AudioContext | null>
+  audioManager?: Audio
 }
 
 export const AppContext = createContext<AppContext>({})
 
 export function App() {
-  const audioRef = useRef<AudioContext>(null)
+  const [audioManager, setAudioManager] = useState<Audio | undefined>(undefined)
+  const elementRef = useRef<HTMLAudioElement>(null)
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    audioRef.current = new AudioContext()
+    if (!isReady) {
+      setIsReady(true)
+      return
+    }
+
+    if (!elementRef.current) return
+
+    const manager = new Audio(elementRef.current)
+
+    setAudioManager(manager)
 
     return () => {
-      if (audioRef.current && audioRef.current.state !== 'closed') {
-        audioRef.current.close()
-      }
+      manager.destroy()
     }
-  }, [])
+  }, [isReady])
+
+  if (!isReady) <main></main>
 
   return (
-    <AppContext
+    <AppContext.Provider
       value={{
-        currentTrack: '',
-        audio: audioRef,
+        audioManager,
       }}
     >
+      <audio ref={elementRef} crossOrigin='anonymous'></audio>
       <main>
         <Tracklist />
+        {/* <button onClick={() => audioManager?.play()}>Play</button> 
+        <button onClick={() => audioManager?.pause()}>Pause</button> */}
       </main>
-    </AppContext>
+    </AppContext.Provider>
   )
 }
 

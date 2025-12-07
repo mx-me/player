@@ -1,5 +1,5 @@
 import { AppContext } from '@/app'
-import { useContext, useEffect, useState } from 'react'
+import { memo, useContext, useEffect, useState } from 'react'
 
 export interface Track {
   id: number
@@ -8,6 +8,35 @@ export interface Track {
   cover: string
   blurhash: string
 }
+
+const TrackItem = memo(
+  ({
+    track,
+    isActive,
+    color,
+    onClick,
+  }: {
+    track: Track
+    isActive: boolean
+    color?: number[]
+    onClick: (track: Track) => void
+  }) => {
+    return (
+      <li
+        onClick={() => onClick(track)}
+        style={
+          isActive && color
+            ? {
+              backgroundColor: `rgba(${color.join(',')},0.3)`,
+            }
+            : {}
+        }
+      >
+        {track.title}
+      </li>
+    )
+  },
+)
 
 export const Tracklist = () => {
   const { audioManager, setTrack, track: currentTrack } = useContext(AppContext)
@@ -34,25 +63,21 @@ export const Tracklist = () => {
     return <ul></ul>
   }
 
+  const handleTrackClick = (track: Track) => {
+    if (setTrack) setTrack(track)
+    audioManager?.changeTrack(track)
+  }
+
   return (
     <ul>
       {tracks.map((track) => (
-        <li
+        <TrackItem
           key={track.id}
-          onClick={() => {
-            if (setTrack) setTrack(track)
-            audioManager?.changeTrack(track)
-          }}
-          style={
-            currentTrack && track.id === currentTrack.id && audioManager?.color
-              ? {
-                  backgroundColor: `rgba(${audioManager.color.join(',')},0.3)`,
-                }
-              : {}
-          }
-        >
-          {track.title}
-        </li>
+          track={track}
+          isActive={currentTrack?.id === track.id}
+          color={audioManager?.color}
+          onClick={handleTrackClick}
+        />
       ))}
     </ul>
   )

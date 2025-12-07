@@ -1,4 +1,5 @@
 import { AppContext } from '@/app'
+import { getBlurHashAverageColor } from 'fast-blurhash'
 import { useContext, useEffect, useRef } from 'react'
 
 export const Art = () => {
@@ -18,18 +19,20 @@ export const Art = () => {
 
         if (audioManager.element.paused) {
           audioManager.play()
-          controlRef.current.classList.remove('play')
-          controlRef.current.classList.add('pause')
         } else {
           audioManager.pause()
-          controlRef.current.classList.remove('pause')
-          controlRef.current.classList.add('play')
         }
       },
       {
         signal: controller.signal,
       },
     )
+
+    if (audioManager.color) {
+      const color = audioManager.color.join(',')
+      artRef.current.style.backgroundColor = `rgb(${color})`
+      artRef.current.style.boxShadow = `rgba(${color}, 0.3) 0px 5px 60px 1px`
+    }
 
     return () => {
       controller.abort()

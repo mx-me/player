@@ -1,3 +1,4 @@
+import { getBlurHashAverageColor } from 'fast-blurhash'
 import { Track } from './components/tracklist'
 
 export class Audio {
@@ -6,6 +7,8 @@ export class Audio {
   private gainNode
 
   public element
+
+  public color?: [number, number, number]
 
   constructor(mediaElement: HTMLAudioElement) {
     this.context = new AudioContext()
@@ -36,10 +39,14 @@ export class Audio {
     this.context.suspend()
   }
 
-  public changeTrack({ location, cover, title }: Track) {
+  public changeTrack({ location, cover, title, blurhash }: Track) {
     this.pause()
     this.element.src = location
     this.play()
+
+    if (blurhash) {
+      this.color = getBlurHashAverageColor(blurhash)
+    }
 
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({

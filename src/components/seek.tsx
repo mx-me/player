@@ -2,85 +2,106 @@ import { AppContext } from '@/app'
 import { useContext, useEffect, useRef } from 'react'
 
 export const Seek = () => {
-  const { audioManager } = useContext(AppContext)
+  const { audioManager, track } = useContext(AppContext)
   const progressRef = useRef<HTMLDivElement>(null)
   const seekRef = useRef<HTMLDivElement>(null)
   const bufferRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!audioManager) return
+    if (seekRef.current) seekRef.current.style.width = '0%'
+    if (bufferRef.current) bufferRef.current.style.width = '0%'
 
-    const { abort, signal } = new AbortController()
+    if (!audioManager || !track) return
 
-    audioManager.element.addEventListener(
+    const { element } = audioManager
+    const controller = new AbortController()
+    const { signal } = controller
+
+    element.addEventListener(
       'timeupdate',
-      (event) => {
-        if (!seekRef.current || !bufferRef.current) return
+      () => {
+        requestAnimationFrame(() => {
+          if (!seekRef.current || !bufferRef.current) return
 
-        const audio = event.target as HTMLAudioElement
+          const { currentTime, duration, buffered } = element
 
-        if (audio.duration > 0) {
-          seekRef.current.style.width = `${(audio.currentTime / audio.duration) * 100}%`
-        }
+          if (duration > 0) {
+            seekRef.current.style.width = `${(currentTime / duration) * 100}%`
+          }
 
-        if (audio.buffered.length) {
-          const buffered = audio.buffered.end(audio.buffered.length - 1)
-          bufferRef.current.style.width = `${(buffered * 100) / audio.duration}%`
-        }
+          if (buffered.length > 0) {
+            const bufferEnd = buffered.end(buffered.length - 1)
+            bufferRef.current.style.width = `${(bufferEnd * 100) / duration}%`
+          }
+        })
       },
       { signal },
     )
 
     let seeking = false
+    let rect: DOMRect | null = null
 
-    const seekTo = (offsetX: number) => {
-      if (!progressRef.current || !seekRef.current) return
+    const seekTo = (clientX: number) => {
+      if (!progressRef.current || !rect || !element.duration) return
 
-      const { duration } = audioManager.element
+      const { duration } = element
       if (!duration) return
 
-      let seekPercent = offsetX / progressRef.current.offsetWidth
+      const offsetX = clientX - rect.left
+      let seekPercent = offsetX / rect.width
 
       if (seekPercent < 0) seekPercent = 0
       if (seekPercent > 1) seekPercent = 1
 
-      audioManager.element.currentTime = seekPercent * duration
+      if (seekRef.current) {
+        seekRef.current.style.width = `${seekPercent * 100}%`
+      }
+
+      element.currentTime = seekPercent * duration
     }
 
     progressRef.current?.addEventListener(
       'pointerdown',
       (event) => {
+        if (!progressRef.current) return
+
         seeking = true
         audioManager.pause()
-        seekTo(event.offsetX)
+
+        rect = progressRef.current.getBoundingClientRect()
+
+        seekTo(event.clientX)
       },
       { signal },
     )
 
-    addEventListener(
+    window.addEventListener(
       'pointermove',
       (event: PointerEvent) => {
         if (!seeking || !progressRef.current) return
-        seekTo(event.clientX - progressRef.current.offsetLeft)
+
+        seekTo(event.clientX)
       },
       { signal },
     )
 
-    addEventListener(
+    window.addEventListener(
       'pointerup',
       (event: PointerEvent) => {
         if (!seeking || !progressRef.current) return
         seeking = false
-        seekTo(event.clientX - progressRef.current.offsetLeft)
+
+        seekTo(event.clientX)
+
         audioManager.play()
       },
       { signal },
     )
 
     return () => {
-      abort()
+      controller.abort()
     }
-  }, [audioManager])
+  }, [audioManager, track])
 
   return (
     <div className='progress-container' ref={progressRef}>

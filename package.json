@@ -10,6 +10,7 @@
     "build": "bun run build.ts"
   },
   "dependencies": {
+    "fast-blurhash": "^1.1.4",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },

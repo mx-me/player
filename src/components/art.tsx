@@ -1,5 +1,4 @@
 import { AppContext } from '@/app'
-import { getBlurHashAverageColor } from 'fast-blurhash'
 import { useContext, useEffect, useRef } from 'react'
 
 export const Art = () => {

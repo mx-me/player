@@ -92,6 +92,7 @@ li:hover {
   aspect-ratio: 1;
   border-radius: 5px;
   overflow: hidden;
+  background-color: #414141;
 }
 
 .art img {

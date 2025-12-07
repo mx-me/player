@@ -10,7 +10,7 @@ export interface Track {
 }
 
 export const Tracklist = () => {
-  const { audioManager, setTrack } = useContext(AppContext)
+  const { audioManager, setTrack, track: currentTrack } = useContext(AppContext)
   const [tracks, setTracks] = useState<Track[]>()
 
   useEffect(() => {
@@ -43,6 +43,13 @@ export const Tracklist = () => {
             if (setTrack) setTrack(track)
             audioManager?.changeTrack(track)
           }}
+          style={
+            currentTrack && track.id === currentTrack.id && audioManager?.color
+              ? {
+                  backgroundColor: `rgba(${audioManager.color.join(',')},0.3)`,
+                }
+              : {}
+          }
         >
           {track.title}
         </li>

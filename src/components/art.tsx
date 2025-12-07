@@ -31,7 +31,7 @@ export const Art = () => {
     if (audioManager.color) {
       const color = audioManager.color.join(',')
       artRef.current.style.backgroundColor = `rgb(${color})`
-      artRef.current.style.boxShadow = `rgba(${color}, 0.3) 0px 5px 60px 1px`
+      artRef.current.style.boxShadow = `rgba(${color}, 0.25) 0px 5px 60px 1px`
     }
 
     return () => {

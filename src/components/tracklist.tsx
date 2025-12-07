@@ -16,7 +16,8 @@ export const Tracklist = () => {
   useEffect(() => {
     if (!audioManager) return
 
-    const { abort, signal } = new AbortController()
+    const controller = new AbortController()
+    const { signal } = controller
 
     fetch('/tracks.json', { signal }).then((req) =>
       req.json().then((tracks) => {
@@ -25,7 +26,7 @@ export const Tracklist = () => {
     )
 
     return () => {
-      abort()
+      controller.abort()
     }
   }, [audioManager])
 

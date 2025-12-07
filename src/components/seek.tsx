@@ -17,11 +17,6 @@ export const Seek = () => {
     const controller = new AbortController()
     const { signal } = controller
 
-    if (seekRef.current && audioManager.color) {
-      const color = audioManager.color.join(',')
-      seekRef.current.style.backgroundColor = `rgb(${color})`
-    }
-
     element.addEventListener(
       'timeupdate',
       () => {

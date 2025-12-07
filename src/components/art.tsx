@@ -1,48 +1,36 @@
 import { AppContext } from '@/app'
-import { useContext, useEffect, useRef } from 'react'
+import { useContext } from 'react'
 
 export const Art = () => {
   const { track, audioManager, isPlaying } = useContext(AppContext)
-  const controlRef = useRef<HTMLDivElement>(null)
-  const artRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (!audioManager || !artRef.current) return
+  const togglePlayback = () => {
+    if (!track || !audioManager) return
 
-    const controller = new AbortController()
-
-    artRef.current.addEventListener(
-      'click',
-      () => {
-        if (!track || !controlRef.current) return
-
-        if (audioManager.element.paused) {
-          audioManager.play()
-        } else {
-          audioManager.pause()
-        }
-      },
-      {
-        signal: controller.signal,
-      },
-    )
-
-    if (audioManager.color) {
-      const color = audioManager.color.join(',')
-      artRef.current.style.backgroundColor = `rgb(${color})`
-      artRef.current.style.boxShadow = `rgba(${color}, 0.25) 0px 5px 60px 1px`
+    if (audioManager.element.paused) {
+      audioManager.play()
+    } else {
+      audioManager.pause()
     }
+  }
 
-    return () => {
-      controller.abort()
+  const artStyle = (() => {
+    if (!audioManager?.color) return undefined
+    const color = audioManager.color.join(',')
+    return {
+      backgroundColor: `rgb(${color})`,
+      boxShadow: `rgba(${color}, 0.25) 0px 5px 60px 1px`,
     }
-  }, [audioManager, track])
+  })()
 
   return (
     <div
       className='art'
-      ref={artRef}
-      style={track ? { cursor: 'pointer' } : { cursor: 'auto' }}
+      style={{
+        ...artStyle,
+        ...(track ? { cursor: 'pointer' } : { cursor: 'auto' }),
+      }}
+      onClick={togglePlayback}
     >
       <div
         className='dim'
@@ -51,7 +39,6 @@ export const Art = () => {
       <div
         className={isPlaying ? 'controls pause' : 'controls play'}
         style={track ? { display: 'block' } : { display: 'none' }}
-        ref={controlRef}
       ></div>
       {track?.cover ? (
         <img

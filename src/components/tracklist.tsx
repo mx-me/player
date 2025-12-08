@@ -1,5 +1,6 @@
 import { AppContext } from '@/app'
 import { memo, useContext, useEffect, useState } from 'react'
+import './tracklist.css'
 
 export interface Track {
   id: number
@@ -27,8 +28,8 @@ const TrackItem = memo(
         style={
           isActive && color
             ? {
-              backgroundColor: `rgba(${color.join(',')},0.3)`,
-            }
+                backgroundColor: `rgba(${color.join(',')},0.3)`,
+              }
             : {}
         }
       >
@@ -39,46 +40,42 @@ const TrackItem = memo(
 )
 
 export const Tracklist = () => {
-  const { audioManager, setTrack, track: currentTrack } = useContext(AppContext)
+  const { manager, track: currentTrack, setTrack } = useContext(AppContext)
   const [tracks, setTracks] = useState<Track[]>()
 
   useEffect(() => {
-    if (!audioManager) return
-
     const controller = new AbortController()
     const { signal } = controller
 
-    fetch('/tracks.json', { signal }).then((req) =>
-      req.json().then((tracks) => {
-        setTracks(tracks)
-      }),
-    )
+    fetch('/tracks.json', { signal })
+      .then((req) =>
+        req.json().then((tracks) => {
+          setTracks(tracks)
+        }),
+      )
+      .catch(() => {})
 
     return () => {
       controller.abort()
     }
-  }, [audioManager])
-
-  if (!tracks) {
-    return <ul></ul>
-  }
-
-  const handleTrackClick = (track: Track) => {
-    if (setTrack) setTrack(track)
-    audioManager?.changeTrack(track)
-  }
+  }, [])
 
   return (
     <ul>
-      {tracks.map((track) => (
-        <TrackItem
-          key={track.id}
-          track={track}
-          isActive={currentTrack?.id === track.id}
-          color={audioManager?.color}
-          onClick={handleTrackClick}
-        />
-      ))}
+      {tracks
+        ? tracks.map((track) => (
+            <TrackItem
+              key={track.id}
+              track={track}
+              isActive={currentTrack?.id === track.id}
+              color={manager?.color}
+              onClick={(track) => {
+                if (setTrack) setTrack(track)
+                manager?.changeTrack(track)
+              }}
+            />
+          ))
+        : ''}
     </ul>
   )
 }

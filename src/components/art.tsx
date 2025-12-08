@@ -1,36 +1,58 @@
 import { AppContext } from '@/app'
-import { useContext } from 'react'
+import { memo, useContext, useEffect, useRef, useState } from 'react'
+import { Track } from './tracklist'
+import './art.css'
+
+const Cover = memo(({ track }: { track?: Track }) => {
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    setIsLoaded(false)
+  }, [track])
+
+  return (
+    <img
+      {...(track ? { src: track.cover } : {})}
+      className='track-art'
+      alt='track cover art'
+      width={300}
+      height={300}
+      fetchPriority='high'
+      style={{
+        opacity: isLoaded ? '1' : '0',
+        display: track ? 'block' : 'none',
+      }}
+      onLoad={() => {
+        setIsLoaded(true)
+      }}
+    />
+  )
+})
 
 export const Art = () => {
-  const { track, audioManager, isPlaying } = useContext(AppContext)
+  const { track, manager, isPlaying } = useContext(AppContext)
+  const artRef = useRef<HTMLDivElement>(null)
 
-  const togglePlayback = () => {
-    if (!track || !audioManager) return
+  useEffect(() => {
+    if (!artRef.current) return
 
-    if (audioManager.element.paused) {
-      audioManager.play()
-    } else {
-      audioManager.pause()
-    }
-  }
+    const color = manager?.color ? manager.color.join(',') : undefined
 
-  const artStyle = (() => {
-    if (!audioManager?.color) return undefined
-    const color = audioManager.color.join(',')
-    return {
-      backgroundColor: `rgb(${color})`,
-      boxShadow: `rgba(${color}, 0.25) 0px 5px 60px 1px`,
-    }
-  })()
+    artRef.current.style.backgroundColor = `rgb(${color})`
+    artRef.current.style.boxShadow = `rgba(${color}, 0.25) 0px 5px 60px 1px`
+  }, [track])
 
   return (
     <div
       className='art'
+      ref={artRef}
       style={{
-        ...artStyle,
-        ...(track ? { cursor: 'pointer' } : { cursor: 'auto' }),
+        cursor: track ? 'pointer' : 'auto',
       }}
-      onClick={togglePlayback}
+      onClick={() => {
+        if (!manager || !track) return
+        manager.audio.paused ? manager.play() : manager?.pause()
+      }}
     >
       <div
         className='dim'
@@ -40,17 +62,7 @@ export const Art = () => {
         className={isPlaying ? 'controls pause' : 'controls play'}
         style={track ? { display: 'block' } : { display: 'none' }}
       ></div>
-      {track?.cover ? (
-        <img
-          src={track?.cover ? `/${track.cover}` : ''}
-          className='track-art'
-          alt='track cover art'
-          width={300}
-          height={300}
-        />
-      ) : (
-        ''
-      )}
+      <Cover track={track} />
     </div>
   )
 }

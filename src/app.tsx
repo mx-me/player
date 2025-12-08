@@ -3,98 +3,64 @@ import {
   Dispatch,
   SetStateAction,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
 import { Track, Tracklist } from './components/tracklist'
 import './index.css'
-import { Audio } from './audio'
+import { Manager } from './manager'
 import { Seek } from './components/seek'
 import { Art } from './components/art'
 
-interface AppContext {
+export const AppContext = createContext<{
   track?: Track
   setTrack?: Dispatch<SetStateAction<Track | undefined>>
   isPlaying?: boolean
-  setIsPlaying?: Dispatch<SetStateAction<boolean>>
-  audioManager?: Audio
-}
+  manager?: Manager
+}>({})
 
-export const AppContext = createContext<AppContext>({})
-
-export function App() {
+export default () => {
   const [track, setTrack] = useState<Track | undefined>(undefined)
+  const [manager, setManager] = useState<Manager | undefined>(undefined)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
-  const [audioManager, setAudioManager] = useState<Audio | undefined>(undefined)
-  const elementRef = useRef<HTMLAudioElement>(null)
-  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    if (!isReady) {
-      setIsReady(true)
-      return
-    }
-
-    if (!elementRef.current) return
-
     const controller = new AbortController()
     const { signal } = controller
 
-    const manager = new Audio(elementRef.current)
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
 
-    elementRef.current.addEventListener(
-      'play',
-      () => {
-        setIsPlaying(true)
-      },
-      { signal },
-    )
+    const audioManager = new Manager()
+    setManager(audioManager)
 
-    elementRef.current.addEventListener(
-      'pause',
-      () => {
-        setIsPlaying(false)
-      },
-      { signal },
-    )
+    const { audio } = audioManager
 
-    elementRef.current.addEventListener(
-      'ended',
-      () => {
-        setIsPlaying(false)
-        console.log(track)
-      },
-      { signal },
-    )
-
-    setAudioManager(manager)
+    audio.addEventListener('play', handlePlay, { signal })
+    audio.addEventListener('pause', handlePause, { signal })
+    audio.addEventListener('ended', handlePause, { signal })
 
     return () => {
-      manager.destroy()
+      audioManager.destroy()
       controller.abort()
     }
-  }, [isReady])
-
-  if (!isReady) <main></main>
+  }, [])
 
   return (
-    <AppContext.Provider
+    <AppContext
       value={{
-        audioManager,
+        manager,
         setTrack,
         track,
-        setIsPlaying,
         isPlaying,
       }}
     >
-      <audio ref={elementRef} crossOrigin='anonymous'></audio>
       <main>
         <Art />
         <Seek />
         <Tracklist />
       </main>
-    </AppContext.Provider>
+    </AppContext>
   )
 }
-
-export default App

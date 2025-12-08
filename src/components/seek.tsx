@@ -1,8 +1,9 @@
 import { AppContext } from '@/app'
 import { useContext, useEffect, useRef } from 'react'
+import './seek.css'
 
 export const Seek = () => {
-  const { audioManager, track } = useContext(AppContext)
+  const { manager: audioManager, track } = useContext(AppContext)
   const progressRef = useRef<HTMLDivElement>(null)
   const seekRef = useRef<HTMLDivElement>(null)
   const bufferRef = useRef<HTMLDivElement>(null)
@@ -13,17 +14,17 @@ export const Seek = () => {
 
     if (!audioManager || !track) return
 
-    const { element } = audioManager
+    const { audio } = audioManager
     const controller = new AbortController()
     const { signal } = controller
 
-    element.addEventListener(
+    audio.addEventListener(
       'timeupdate',
       () => {
         requestAnimationFrame(() => {
           if (!seekRef.current || !bufferRef.current) return
 
-          const { currentTime, duration, buffered } = element
+          const { currentTime, duration, buffered } = audio
 
           if (duration > 0) {
             seekRef.current.style.width = `${(currentTime / duration) * 100}%`
@@ -42,9 +43,9 @@ export const Seek = () => {
     let rect: DOMRect | null = null
 
     const seekTo = (clientX: number) => {
-      if (!progressRef.current || !rect || !element.duration) return
+      if (!progressRef.current || !rect || !audio.duration) return
 
-      const { duration } = element
+      const { duration } = audio
       if (!duration) return
 
       const offsetX = clientX - rect.left
@@ -57,7 +58,7 @@ export const Seek = () => {
         seekRef.current.style.width = `${seekPercent * 100}%`
       }
 
-      element.currentTime = seekPercent * duration
+      audio.currentTime = seekPercent * duration
     }
 
     progressRef.current?.addEventListener(

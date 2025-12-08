@@ -12,16 +12,16 @@ import { Seek } from './components/seek'
 import { Art } from './components/art'
 
 export const AppContext = createContext<{
-  track?: Track
-  setTrack?: Dispatch<SetStateAction<Track | undefined>>
-  isPlaying?: boolean
   manager?: Manager
+  setTrack?: Dispatch<SetStateAction<Track | undefined>>
+  track?: Track
+  isPlaying?: boolean
 }>({})
 
 export default () => {
   const [track, setTrack] = useState<Track | undefined>(undefined)
-  const [manager, setManager] = useState<Manager | undefined>(undefined)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
+  const [manager] = useState<Manager>(() => new Manager())
 
   useEffect(() => {
     const controller = new AbortController()
@@ -30,17 +30,13 @@ export default () => {
     const handlePlay = () => setIsPlaying(true)
     const handlePause = () => setIsPlaying(false)
 
-    const audioManager = new Manager()
-    setManager(audioManager)
-
-    const { audio } = audioManager
+    const { audio } = manager
 
     audio.addEventListener('play', handlePlay, { signal })
     audio.addEventListener('pause', handlePause, { signal })
     audio.addEventListener('ended', handlePause, { signal })
 
     return () => {
-      audioManager.destroy()
       controller.abort()
     }
   }, [])
@@ -49,9 +45,9 @@ export default () => {
     <AppContext
       value={{
         manager,
-        setTrack,
         track,
         isPlaying,
+        setTrack,
       }}
     >
       <main>

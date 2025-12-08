@@ -3,8 +3,6 @@ import {
   Dispatch,
   SetStateAction,
   useEffect,
-  useMemo,
-  useRef,
   useState,
 } from 'react'
 import { Track, Tracklist } from './components/tracklist'

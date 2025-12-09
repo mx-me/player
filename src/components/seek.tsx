@@ -50,7 +50,6 @@ export const Seek = () => {
 
       const offsetX = clientX - rect.left
       let seekPercent = offsetX / rect.width
-      console.log(seekPercent, duration)
 
       if (!seekPercent) return
       if (seekPercent < 0) seekPercent = 0

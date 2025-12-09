@@ -1,9 +1,9 @@
 import { AppContext } from '@/app'
-import { useContext, useEffect, useRef } from 'react'
+import { use, useEffect, useRef } from 'react'
 import './seek.css'
 
 export const Seek = () => {
-  const { manager: audioManager, track } = useContext(AppContext)
+  const { manager: audioManager, track } = use(AppContext)
   const progressRef = useRef<HTMLDivElement>(null)
   const seekRef = useRef<HTMLDivElement>(null)
   const bufferRef = useRef<HTMLDivElement>(null)

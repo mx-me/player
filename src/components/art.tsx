@@ -1,9 +1,9 @@
 import { AppContext } from '@/app'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useMemo, useState } from 'react'
 import './art.css'
 
 export const Art = () => {
-  const { track, manager, isPlaying } = useContext(AppContext)
+  const { track, manager, isPlaying } = use(AppContext)
   const [isLoaded, setIsLoaded] = useState(false)
 
   const style = useMemo(() => {

@@ -1,5 +1,5 @@
 import { AppContext } from '@/app'
-import { memo, useContext, useEffect, useState } from 'react'
+import { memo, use, useEffect, useState } from 'react'
 import './tracklist.css'
 
 export interface Track {
@@ -24,13 +24,10 @@ const TrackItem = memo(
   }) => (
     <li
       onClick={() => onClick(track)}
-      style={
-        isActive && color
-          ? {
-              backgroundColor: `rgba(${color.join(',')},0.3)`,
-            }
-          : {}
-      }
+      style={{
+        backgroundColor:
+          isActive && color ? `rgba(${color.join(',')},0.3)` : '',
+      }}
     >
       {track.title}
     </li>
@@ -38,7 +35,7 @@ const TrackItem = memo(
 )
 
 export const Tracklist = () => {
-  const { manager, track: currentTrack, setTrack } = useContext(AppContext)
+  const { manager, track: currentTrack, setTrack } = use(AppContext)
   const [tracks, setTracks] = useState<Track[]>()
 
   useEffect(() => {
@@ -46,12 +43,12 @@ export const Tracklist = () => {
     const { signal } = controller
 
     fetch('/tracks.json', { signal })
-      .then((req) =>
-        req.json().then((tracks) => {
-          setTracks(tracks)
-        }),
-      )
-      .catch(() => {})
+      .then(async (req) => {
+        setTracks((await req.json()) as Track[])
+      })
+      .catch(() => {
+        setTracks([])
+      })
 
     return () => {
       controller.abort()

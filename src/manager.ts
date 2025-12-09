@@ -33,7 +33,7 @@ export class Manager {
     if (this.context.state === 'suspended') {
       this.context.resume()
     }
-    this.audio.play()
+    this.audio.play().catch(() => { })
   }
 
   public pause() {

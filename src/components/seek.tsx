@@ -43,10 +43,16 @@ export const Seek = () => {
     let rect: DOMRect | null = null
 
     const seekTo = (clientX: number) => {
-      if (!progressRef.current || !rect || !audio.duration) return
+      if (
+        !progressRef.current ||
+        !rect ||
+        !audio.duration ||
+        !isFinite(audio.duration)
+      ) {
+        return
+      }
 
       const { duration } = audio
-      if (!duration) return
 
       const offsetX = clientX - rect.left
       let seekPercent = offsetX / rect.width

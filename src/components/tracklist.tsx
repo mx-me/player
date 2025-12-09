@@ -21,22 +21,20 @@ const TrackItem = memo(
     isActive: boolean
     color?: number[]
     onClick: (track: Track) => void
-  }) => {
-    return (
-      <li
-        onClick={() => onClick(track)}
-        style={
-          isActive && color
-            ? {
-                backgroundColor: `rgba(${color.join(',')},0.3)`,
-              }
-            : {}
-        }
-      >
-        {track.title}
-      </li>
-    )
-  },
+  }) => (
+    <li
+      onClick={() => onClick(track)}
+      style={
+        isActive && color
+          ? {
+              backgroundColor: `rgba(${color.join(',')},0.3)`,
+            }
+          : {}
+      }
+    >
+      {track.title}
+    </li>
+  ),
 )
 
 export const Tracklist = () => {

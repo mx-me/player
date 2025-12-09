@@ -26,7 +26,7 @@ export const Seek = () => {
 
           const { currentTime, duration, buffered } = audio
 
-          if (duration > 0) {
+          if (duration > 0 && currentTime && duration) {
             seekRef.current.style.width = `${(currentTime / duration) * 100}%`
           }
 
@@ -50,7 +50,9 @@ export const Seek = () => {
 
       const offsetX = clientX - rect.left
       let seekPercent = offsetX / rect.width
+      console.log(seekPercent, duration)
 
+      if (!seekPercent) return
       if (seekPercent < 0) seekPercent = 0
       if (seekPercent > 1) seekPercent = 1
 

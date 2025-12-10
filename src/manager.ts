@@ -10,6 +10,7 @@ export class Manager {
 
   constructor() {
     const audio = new Audio()
+    audio.crossOrigin = 'anonymous'
 
     this.context = new AudioContext()
     this.sourceNode = this.context.createMediaElementSource(audio)

@@ -4,9 +4,13 @@ import './seek.css'
 
 export const Seek = () => {
   const { manager: audioManager, track } = use(AppContext)
+
   const progressRef = useRef<HTMLDivElement>(null)
   const seekRef = useRef<HTMLDivElement>(null)
   const bufferRef = useRef<HTMLDivElement>(null)
+
+  const isDragging = useRef(false)
+  const wasPlaying = useRef(false)
 
   useEffect(() => {
     if (seekRef.current) seekRef.current.style.width = '0%'
@@ -15,103 +19,122 @@ export const Seek = () => {
     if (!audioManager || !track) return
 
     const { audio } = audioManager
-    const controller = new AbortController()
-    const { signal } = controller
+    let animationFrameId: number
 
-    audio.addEventListener(
-      'timeupdate',
-      () => {
-        requestAnimationFrame(() => {
-          if (!seekRef.current || !bufferRef.current) return
+    const updateProgress = () => {
+      if (!seekRef.current || !bufferRef.current) return
 
-          const { currentTime, duration, buffered } = audio
+      const { currentTime, duration, buffered } = audio
 
-          if (duration > 0 && currentTime && duration) {
-            seekRef.current.style.width = `${(currentTime / duration) * 100}%`
-          }
+      const validDuration = duration > 0 && isFinite(duration)
 
-          if (buffered.length > 0) {
-            const bufferEnd = buffered.end(buffered.length - 1)
-            bufferRef.current.style.width = `${(bufferEnd * 100) / duration}%`
-          }
-        })
-      },
-      { signal },
-    )
-
-    let seeking = false
-    let rect: DOMRect | null = null
-
-    const seekTo = (clientX: number) => {
-      if (
-        !progressRef.current ||
-        !rect ||
-        !audio.duration ||
-        !isFinite(audio.duration)
-      ) {
-        return
+      if (!isDragging.current && validDuration) {
+        const percent = (currentTime / duration) * 100
+        seekRef.current.style.width = `${percent}%`
       }
 
-      const { duration } = audio
+      if (buffered.length > 0 && validDuration) {
+        for (let i = 0; i < buffered.length; i++) {
+          if (
+            buffered.start(i) <= currentTime &&
+            buffered.end(i) >= currentTime
+          ) {
+            const bufferEnd = buffered.end(i)
+            const bufferPercent = (bufferEnd / duration) * 100
+            bufferRef.current.style.width = `${bufferPercent}%`
+            break
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(updateProgress)
+    }
+
+    animationFrameId = requestAnimationFrame(updateProgress)
+
+    const handleSeekVisuals = (clientX: number, rect: DOMRect) => {
+      if (!seekRef.current) return
 
       const offsetX = clientX - rect.left
       let seekPercent = offsetX / rect.width
 
-      if (seekPercent < 0) seekPercent = 0
-      if (seekPercent > 1) seekPercent = 1
+      seekPercent = Math.max(0, Math.min(1, seekPercent))
 
-      if (seekRef.current) {
-        seekRef.current.style.width = `${seekPercent * 100}%`
-      }
+      seekRef.current.style.width = `${seekPercent * 100}%`
 
-      audio.currentTime = seekPercent * duration
+      return seekPercent
     }
 
-    progressRef.current?.addEventListener(
-      'pointerdown',
-      (event) => {
-        if (!progressRef.current) return
+    const onPointerDown = (e: PointerEvent) => {
+      if (!progressRef.current || !audio.duration) return
 
-        seeking = true
-        audioManager.pause()
+      const target = e.currentTarget as HTMLDivElement
+      target.setPointerCapture(e.pointerId)
 
-        rect = progressRef.current.getBoundingClientRect()
+      isDragging.current = true
 
-        seekTo(event.clientX)
-      },
-      { signal },
-    )
+      wasPlaying.current = !audio.paused
+      audio.pause()
 
-    window.addEventListener(
-      'pointermove',
-      (event: PointerEvent) => {
-        if (!seeking || !progressRef.current) return
+      const rect = progressRef.current.getBoundingClientRect()
+      handleSeekVisuals(e.clientX, rect)
+    }
 
-        seekTo(event.clientX)
-      },
-      { signal },
-    )
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDragging.current || !progressRef.current) return
 
-    window.addEventListener(
-      'pointerup',
-      (event: PointerEvent) => {
-        if (!seeking || !progressRef.current) return
-        seeking = false
+      const rect = progressRef.current.getBoundingClientRect()
+      handleSeekVisuals(e.clientX, rect)
+    }
 
-        seekTo(event.clientX)
+    const onPointerUp = (e: PointerEvent) => {
+      if (!isDragging.current || !progressRef.current) return
 
+      isDragging.current = false
+
+      const target = e.currentTarget as HTMLDivElement
+      target.releasePointerCapture(e.pointerId)
+
+      const rect = progressRef.current.getBoundingClientRect()
+      const seekPercent = handleSeekVisuals(e.clientX, rect)
+
+      if (seekPercent !== undefined && isFinite(audio.duration)) {
+        audio.currentTime = seekPercent * audio.duration
+      }
+
+      if (wasPlaying.current) {
         audioManager.play()
-      },
-      { signal },
-    )
+      }
+    }
+
+    const progressBar = progressRef.current
+    if (progressBar) {
+      progressBar.addEventListener('pointerdown', onPointerDown)
+      progressBar.addEventListener('pointermove', onPointerMove)
+      progressBar.addEventListener('pointerup', onPointerUp)
+      progressBar.addEventListener('pointercancel', onPointerUp)
+    }
 
     return () => {
-      controller.abort()
+      cancelAnimationFrame(animationFrameId)
+      if (progressBar) {
+        progressBar.removeEventListener('pointerdown', onPointerDown)
+        progressBar.removeEventListener('pointermove', onPointerMove)
+        progressBar.removeEventListener('pointerup', onPointerUp)
+        progressBar.removeEventListener('pointercancel', onPointerUp)
+      }
     }
   }, [audioManager, track])
 
   return (
-    <div className='progress-container' ref={progressRef}>
+    <div
+      className='progress-container'
+      ref={progressRef}
+      role='slider'
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label='Audio Progress'
+    >
       <div className='seek' ref={seekRef}></div>
       <div className='buffered' ref={bufferRef}></div>
     </div>
